@@ -1,0 +1,171 @@
+---
+title: "Salud Oral: Tratamiento Convencional y No Convenional en adulto mayor"
+author: "Bastián Chávez"
+date: "5 de julio de 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#  {.tabset .tabset-fade .tabset-pills}
+## I. Antecedentes
+
+### Formulación
+**Propósito**:  Evaluar el impacto de estrategias convencionales versus mínimamente invasivas en la adherencia a tratamiento protésico y en calidad de vida de adultos mayores de la Región Metropolitana de Santiago, Chile.
+
+**Método**
+
+- Durante los años 2012 al 2016, una cohorte de 2.134 adultos mayores consultó por atención odontológica en servicios públicos y privados de la región metropolitana en busca de soluciones protésicas. Todos los interesados firmaron los documentos de consentimiento informado de cada institución Los pacientes fueron tratados de acuerdo a los protocolos de atención institucionales.
+
+- Grupo A estrategias mínimamente invasivas (remoción incompleta de caries y restauración pos-endodóntica) Grupo B estrategias convencionales (remoción completa de caries y Protesis fija). Todos los pacientes eran ASA I y II.  
+
+- Se les clasificó según el índice de Eichner, que clasifica en A(1), B(2) y C(3), que representan las categorías oclusales. Las arcadas clasificadas como A tienen contacto oclusal en las cuatro áreas masticatorias; las arcadas clasificadas como B tienen contacto oclusal pero no en todas las áreas masticatorias; y las arcadas clasificadas como C no presentan ningún contacto oclusal aunque pueden quedar dientes remanentes.
+
+- Al inicio y término del tratamiento se les aplicó el Índice Geriátrico de Salud Oral (GOHAI) y se observó la adherencia al tratamiento protésico.
+
+ 
+
+### Diccionario de varibles
+| Variable Name | Definición    |
+|:--------------|:---------------------------------|
+| `Genero`        | Masculino=0 / Femenino=1|
+| `Edad`          | Edad del paciente |
+| `Año`           | Año de la intervención |
+| `Grupo`         | A: Mínimamente invasiva / B: Convensional|
+| `Eichner`       | 1: A / 2: B / 3: C |
+| `GI (Gohai Inicial)` |  Bajo: -de 50  / Moderado: entre 51 y 56 / Alto: entre 57 y 60|
+| `GI (Gohai Final)` |  Bajo: -de 50  / Moderado: entre 51 y 56 / Alto: entre 57 y 60|
+| `Adh1`          | Adhesión inicial al uso protésico |
+| `Adh2`          | Adhesión final al uso protésico |
+
+#### Sumario de variables
+```{r}
+load("Convencional_rec.RData")
+summary(Convencional)
+str(Convencional)
+```
+
+
+## II. Análisis
+
+A continuación se desarrollan distintos análisis descriptivos...
+```{r echo=FALSE}
+library(descr)
+library(ggplot2)
+library(extrafont)
+```
+
+#### Crosstable Adherencia2 vs Grupo
+```{r echo=FALSE}
+CrossTable(Convencional$Adh2, Convencional$Grupo, 
+           prop.r = FALSE, prop.c =TRUE, prop.t = FALSE, 
+           prop.chisq = FALSE, chisq = TRUE, format = "SPSS", 
+           expected = FALSE)
+```
+
+#### Crosstable Grupo vs sexo
+```{r echo=FALSE}
+CrossTable(Convencional$Genero, Convencional$Grupo, 
+           prop.r = FALSE, prop.c =TRUE, prop.t = FALSE, 
+           prop.chisq = FALSE, chisq = TRUE, format = "SPSS", 
+           expected = FALSE)
+```
+
+#### Crosstable Eichner vs Grupo
+```{r echo=FALSE}
+CrossTable(Convencional$Eichner, Convencional$Grupo, 
+           prop.r = FALSE, prop.c =TRUE, prop.t = FALSE, 
+           prop.chisq = FALSE, chisq = TRUE, format = "SPSS", 
+           expected = FALSE)
+```
+
+#### Crosstable GF_rec vs Grupo
+```{r echo=FALSE}
+CrossTable(Convencional$GF_rec, Convencional$Grupo, 
+           prop.r = FALSE, prop.c =TRUE, prop.t = FALSE, 
+           prop.chisq = FALSE, chisq = TRUE, format = "SPSS", 
+           expected = FALSE)
+```
+
+
+#### BARRAS Grupo*GF_rec
+```{r echo=FALSE}
+grupo_GFrec <- ggplot(data= Convencional, aes(x = GF_rec, colour = GF_rec, fill=GF_rec)) + 
+  labs(title= "Grupos A y B según Gohai Final recodificado", x="Índice de Gohai Final", y="N° pacientes")
+
+grupo_GFrec + facet_grid(.~Grupo, scales="free") + geom_bar(position = "dodge") +
+  theme(plot.title = element_text(colour="DarkBlue", size=20, family="Ubuntu" ),
+        legend.position = "none",
+        axis.title.x = element_text(size=15, family = "Ubuntu" ),
+        axis.title.y= element_text(size=15, family = "Ubuntu" ))
+```
+
+
+#### BOXPLOT GF*Grupo 
+```{r echo=FALSE}
+p_base <- ggplot(data = Convencional, aes(x = Grupo , y = GF, colour = Grupo)) + 
+  labs(title= "Grupos A y B según Gohai Final", x="Grupos", y="Índice de Gohai Final")
+
+p_base + geom_boxplot(size=1.2) +
+  theme(plot.title = element_text(colour="DarkBlue", size=20, family="Ubuntu" ),
+        legend.position = "none",
+        axis.title.x = element_text(size=15, family = "Ubuntu" ),
+        axis.title.y= element_text(size=15, family = "Ubuntu" ))
+```
+
+
+#### BOXPLOT GF*Grupo con jitter
+```{r echo=FALSE}
+p_base + geom_jitter() + geom_boxplot(size=1.2, alpha=0.5) +
+  theme(plot.title = element_text(colour="DarkBlue", size=20, family="Ubuntu" ),
+        legend.position = "none",
+        axis.title.x = element_text(size=15, family = "Ubuntu" ),
+        axis.title.y= element_text(size=15, family = "Ubuntu" ))
+```
+
+
+
+## III. Discusión
+
+El set de datos es robusto, tanto en su cantidad (n=796), como en su cualidad, al poseer indicadores de salud sólidos y altamente informativos. A continuación los análisis que se deben formular:
+
+####Condición de Salud
+La condición de salud se mide a través de tres indicadores:
+1) **Eichner**, que mide el grado contacto oclusal. Las clasificadas como A(1) tienen contacto oclusal en las cuatro áreas masticatorias; las clasificadas como B(2) tienen contacto oclusal pero no en todas las áreas masticatorias; y las clasificadas como C(3) no presentan ningún contacto oclusal aunque pueden quedar dientes remanentes.
+```{r echo=FALSE}
+summary(Convencional$Eichner)
+ggplot(data = Convencional, aes(x=Eichner)) + geom_bar()
+```
+
+2) **Indice de Gohai**, que tiene dos mediciones, ANTES y DESPUÉS del tratamiento. Es notoria la movilización de 383 individuos, que superaron la condición de Bajo, posicionandose en Moderado y Alto.
+```{r echo=FALSE}
+summary(Convencional$GI)
+summary(Convencional$GI_rec)
+summary(Convencional$GF)
+summary(Convencional$GF_rec)
+```
+
+3) **Adherencia**, que mide la adherencia al tratamiento protésico. Aquí también es notorio el cambio de Sí a No, que identifica a 433 individuos.
+```{r echo=FALSE}
+summary(Convencional$Adh1)
+summary(Convencional$Adh2)
+```
+
+
+#### Género y Condición de Salud
+
+La muestra se compone mayoritariamente por individuos femeninos.
+```{r echo=FALSE}
+summary(Convencional$Genero)
+```
+
+Si comparamos la edad según género obtenemos
+```{r echo=FALSE}
+tapply(Convencional$Edad, Convencional$Genero, mean)
+```
+
+## IV. Conclusiones
+![](viejito.jpg)
+
